@@ -21,3 +21,7 @@ Route::get('/parse', [\App\Http\Controllers\ParserController::class, 'index']);
 Route::get('/auth', [\App\Http\Controllers\ParserController::class, 'auth']);
 Route::get('/seats/{hallId}', [\App\Http\Controllers\ParserController::class, 'seats']);
 Route::get('/countedSeats/{hallId}', [\App\Http\Controllers\ParserController::class, 'countedSeats']);
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

@@ -26,7 +26,7 @@ class ParserController extends Controller
     public function auth()
     {
         $client = new Client();
-        $url = 'http://185.211.129.21:6003/api/CultureTicket/Token';
+        $url = 'https://new.cultureticket.uz/api/CultureTicket/Token';
         $res = $client->request('POST', $url, [
                 'json' => [
                         "login" => 'aAgent',
@@ -52,7 +52,7 @@ class ParserController extends Controller
 
     public function seats($hallId = "319")
     {
-        $url ='http://185.211.129.21:6003/api/CultureTicket/PalaceHallSeats/' . $hallId;
+        $url ='https://new.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $hallId;
         $client = new Client();
         $res = $client->request('GET', $url, [
                 'headers' => [
@@ -67,7 +67,7 @@ class ParserController extends Controller
 
     public function countedSeats($hallId = "319")
     {
-        $url ='http://185.211.129.21:6003/api/CultureTicket/PalaceHallSeats/' . $hallId;
+        $url ='https://new.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $hallId;
         $client = new Client();
         $res = $client->request('GET', $url, [
                 'headers' => [
