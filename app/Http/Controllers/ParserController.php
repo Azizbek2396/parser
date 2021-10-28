@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use phpDocumentor\Reflection\Types\Object_;
 
 class ParserController extends Controller
 {
@@ -27,9 +28,10 @@ class ParserController extends Controller
     {
         $client = new Client();
         $url = 'https://cabinet.cultureticket.uz/api/CultureTicket/Token';
+
         $res = $client->request('POST', $url, [
                 'json' => [
-                        "login" => 'aAgent',
+                        "login" => 'umar@iticket.uz',
                         "password" => '123456'
                 ]
         ]);
@@ -50,15 +52,22 @@ class ParserController extends Controller
         return $token;
     }
 
+    public function getResponse($url) {
+        $client = new Client();
+        $res = $client->request('GET', $url, [
+            'headers' => [
+                'Authorization' => "Bearer " . $this->getToken(),
+            ]
+        ]);
+
+        return $res;
+    }
+
     public function seats($hallId = "319")
     {
         $url ='https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $hallId;
-        $client = new Client();
-        $res = $client->request('GET', $url, [
-                'headers' => [
-                    'Authorization' => "Bearer " . $this->getToken(),
-                ]
-        ]);
+
+        $res = $this->getResponse($url);
 
         $seats = json_decode($res->getBody()->getContents(), true);
 
@@ -68,12 +77,8 @@ class ParserController extends Controller
     public function countedSeats($hallId = "319")
     {
         $url ='https://cabinet.cultureticket.uz/api/CultureTicket/PalaceHallSeats/' . $hallId;
-        $client = new Client();
-        $res = $client->request('GET', $url, [
-                'headers' => [
-                    'Authorization' => "Bearer " . $this->getToken(),
-                ]
-        ]);
+
+        $res = $this->getResponse($url);
 
         $seats = json_decode($res->getBody()->getContents(), true);
 
@@ -96,5 +101,61 @@ class ParserController extends Controller
         array_push($arr, ['sectorName' => $sectorName, 'rowNumber' => $rowNumber, 'countSeats' => $count]);
         array_push($arr, ['total' => $total]);
         return $arr;
+    }
+
+    public function checkBuy($sessionId = "1554") {
+        $url ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $sessionId;
+        $res = $this->getResponse($url);
+        $seats = json_decode($res->getBody()->getContents(), true);
+
+        $data = [];
+        $tickets = [];
+        $TotalSeatsCount = 0;
+
+        foreach ($seats['result'] as $seat) {
+            array_push($data, $seat);
+            $TotalSeatsCount++;
+        }
+
+        $object = new \stdClass();
+        $src = new \stdClass();
+        $object->data = $data;
+        $object->Total = $TotalSeatsCount;
+        $src->src = $object;
+
+        $statusCount = 0;
+        $statusNames = [];
+        $ticketStatusName = $seats['result'][0]['ticketStatusName'];
+        array_push($statusNames, $ticketStatusName);
+
+        foreach ($seats['result'] as $seat) {
+            if ($seat['ticketStatusName'] !== $ticketStatusName && !in_array($seat['ticketStatusName'], $statusNames)) {
+                array_push($statusNames, $seat['ticketStatusName']);
+                $ticketStatusName = $seat['ticketStatusName'];
+            }
+        }
+
+        $statusData = new \stdClass();
+        $sortedSeats = [];
+        foreach ($statusNames as $statusName) {
+            foreach ($seats['result'] as $seat) {
+                if($seat['ticketStatusName'] === $statusName) {
+                    array_push($sortedSeats, $seat);
+                    $statusCount++;
+                }
+            }
+            $statusData->$statusName = new \stdClass();
+            $statusData->$statusName->tickets = $sortedSeats;
+            $statusData->$statusName->totalCount = $statusCount;
+            $sortedSeats = [];
+            $statusCount = 0;
+        }
+
+
+        $all = new \stdClass();
+        $all->src = $src;
+        $all->calculate = $statusData;
+
+        return $all;
     }
 }

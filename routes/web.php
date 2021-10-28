@@ -21,6 +21,7 @@ Route::get('/parse', [\App\Http\Controllers\ParserController::class, 'index']);
 Route::get('/auth', [\App\Http\Controllers\ParserController::class, 'auth']);
 Route::get('/seats/{hallId}', [\App\Http\Controllers\ParserController::class, 'seats']);
 Route::get('/countedSeats/{hallId}', [\App\Http\Controllers\ParserController::class, 'countedSeats']);
+Route::get('/checkBuy/{sessionId}', [\App\Http\Controllers\ParserController::class, 'checkBuy']);
 
 Auth::routes();
 
