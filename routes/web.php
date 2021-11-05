@@ -14,14 +14,18 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
 
-Route::get('/parse', [\App\Http\Controllers\ParserController::class, 'index']);
-Route::get('/auth', [\App\Http\Controllers\ParserController::class, 'auth']);
+Route::get('/parse', [\App\Http\Controllers\ParserController::class, 'parser']);
+Route::get('/auth', [\App\Http\Controllers\ParserController::class, 'auth'])->name('auth');
+Route::post('/auth1', [\App\Http\Controllers\ParserController::class, 'auth1'])->name('auth1');
 Route::get('/seats/{hallId}', [\App\Http\Controllers\ParserController::class, 'seats']);
 Route::get('/countedSeats/{hallId}', [\App\Http\Controllers\ParserController::class, 'countedSeats']);
-Route::get('/checkBuy/{sessionId}', [\App\Http\Controllers\ParserController::class, 'checkBuy']);
+Route::get('/checkSale/{sessionId}', [\App\Http\Controllers\ParserController::class, 'checkSale']);
+Route::get('/checkTarif/{sessionId}', [\App\Http\Controllers\ParserController::class, 'checkTarif']);
+Route::get('/checkDuplicate/{sessionId}', [\App\Http\Controllers\ParserController::class, 'checkDuplicate']);
+Route::get('testGuzzle', [\App\Http\Controllers\ParserController::class, 'testGuzzle']);
 
 Auth::routes();
 
