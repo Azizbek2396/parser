@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
-use phpDocumentor\Reflection\Types\Object_;
 
 class ParserController extends Controller
 {
@@ -45,26 +44,7 @@ class ParserController extends Controller
         dd($json);
     }
 
-    public function auth1(Request $request) {
-        $login = $request->login;
-        $password = $request->password;
 
-        $client = new Client();
-        $url = 'https://cabinet.cultureticket.uz/api/CultureTicket/Token';
-
-
-        $res = $client->request('POST', $url, [
-            'json' => [
-                "login" => $login,
-                "password" => $password
-            ]
-        ]);
-
-        dd($res->getStatusCode());
-        $json = json_decode($res->getBody()->getContents(), true);
-
-        dd($json['error']);
-    }
 
     public function getToken()
     {

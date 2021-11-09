@@ -5,6 +5,10 @@
 
 <body>
 <div id="login">
+    @if (Session::has('error'))
+        <br>
+        <div class="alert alert-danger">{{ Session::get('error') }}</div>
+    @endif
     <h3 class="text-center text-white pt-5">Login form</h3>
     <div class="container">
         <div id="login-row" class="row justify-content-center align-items-center">
