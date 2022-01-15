@@ -13,9 +13,12 @@
         <h1>Hi guys. You can find some usefull things</h1>
         <div class="checkSale">
             <form action="{{ route('checkSale') }}" methon="POST">
+{{--                @csrf--}}
+                <div class="form-group">
+                    <label for="sessionId">Session ID</label>
+                    <input type="text" name="sessionId" id="sessionId">
+                </div>
                 @csrf
-                <label for="sessionId">Session ID</label>
-                <input name="sessionId" id="sessionId">
                 <button type="submit">Submit</button>
             </form>
             <br>

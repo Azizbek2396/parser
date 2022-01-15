@@ -32,7 +32,8 @@ class ParserController extends Controller
                 'json' => [
                         "login" => 'umar@iticket.uz',
                         "password" => '123456'
-                ]
+                ],
+            'verify' => false
         ]);
 
         $json = json_decode($res->getBody()->getContents(), true);
@@ -58,7 +59,8 @@ class ParserController extends Controller
         $res = $client->request('GET', $url, [
             'headers' => [
                 'Authorization' => "Bearer " . $this->getToken(),
-            ]
+            ],
+            'verify' => false
         ]);
 
         return $res;
@@ -134,7 +136,6 @@ class ParserController extends Controller
                 $ticketStatusName = $seat['ticketStatusName'];
             }
         }
-
         $statusData = new \stdClass();
         $sortedSeats = [];
         foreach ($statusNames as $statusName) {
@@ -155,8 +156,11 @@ class ParserController extends Controller
         $all = new \stdClass();
         $all->src = $src;
         $all->calculate = $statusData;
+//        dd($all);
 
-        return $all;
+        return [
+            'all' => $all
+        ];
     }
 
     public function checkTarif($sessionId = "1554") {
@@ -210,8 +214,9 @@ class ParserController extends Controller
         $all = new \stdClass();
         $all->src = $src;
         $all->calculate = $statusData;
-
-        return $all;
+        return [
+            'all' => $all
+        ];
     }
 
     public function checkDuplicate($sessionId = '1554') {
@@ -219,7 +224,6 @@ class ParserController extends Controller
         $res = $this->getResponse($url);
         $seats = json_decode($res->getBody()->getContents(), true);
         $seats = $seats['result'];
-//        dd($seats);
 
         $TotalSeatsCount = 0;
 

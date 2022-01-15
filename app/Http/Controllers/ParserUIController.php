@@ -63,7 +63,7 @@ class ParserUIController extends Controller {
 
     public function checkSale(Request $request) {
 
-        dd($request->sessionId);
+        dd($request);
         $url ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $request->sessionId;
         $res = $this->getResponse($url);
         $seats = json_decode($res->getBody()->getContents(), true);
