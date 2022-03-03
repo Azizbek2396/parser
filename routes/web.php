@@ -32,6 +32,9 @@ Route::get('testGuzzle', [\App\Http\Controllers\ParserController::class, 'testGu
 Route::post('/auth1', [\App\Http\Controllers\ParserUIController::class, 'auth1'])->name('auth1');
 //Route::get('/auth1', [\App\Http\Controllers\ParserUIController::class, 'auth1'])->name('auth123');
 Route::post('/checkBuy', [\App\Http\Controllers\ParserUIController::class, 'checkSale'])->name('checkSale');
+Route::get('/report/{id}', [\App\Http\Controllers\ReportController::class, 'index'])->name('report.view');
+Route::get('/report', [\App\Http\Controllers\ReportController::class, 'index'])->name('report.index');
+
 
 Auth::routes();
 

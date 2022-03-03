@@ -28,6 +28,7 @@ Homestead.json
 # workspace files are user-specific
 *.sublime-workspace
 
+public/events/*
 .idea/
 /public/data/*
 .env
