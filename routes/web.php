@@ -22,8 +22,11 @@ Route::get('/auth', [\App\Http\Controllers\ParserController::class, 'auth'])->na
 Route::get('/seats/{hallId}', [\App\Http\Controllers\ParserController::class, 'seats']);
 Route::get('/countedSeats/{hallId}', [\App\Http\Controllers\ParserController::class, 'countedSeats']);
 Route::get('/checkSale/{sessionId}', [\App\Http\Controllers\ParserController::class, 'checkSale']);
+Route::get('/checkByTarif/{sessionId}', [\App\Http\Controllers\ParserController::class, 'checkByTarif']);
 Route::get('/checkTarif/{sessionId}', [\App\Http\Controllers\ParserController::class, 'checkTarif']);
 Route::get('/checkDuplicate/{sessionId}', [\App\Http\Controllers\ParserController::class, 'checkDuplicate']);
+Route::get('/scheme', [\App\Http\Controllers\ParserController::class, 'scheme']);
+Route::get('/scheme/{count}', [\App\Http\Controllers\ParserController::class, 'scheme']);
 Route::get('testGuzzle', [\App\Http\Controllers\ParserController::class, 'testGuzzle']);
 
 Route::post('/auth1', [\App\Http\Controllers\ParserUIController::class, 'auth1'])->name('auth1');

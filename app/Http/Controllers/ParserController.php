@@ -163,6 +163,99 @@ class ParserController extends Controller
         ];
     }
 
+    public function checkByTarif($sessionId = "1554") {
+        $url ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $sessionId;
+        $urlTarif ='https://cabinet.cultureticket.uz/api/CultureTicket/Tarifs/' . $sessionId;
+
+        $res = $this->getResponse($url);
+        $seats = json_decode($res->getBody()->getContents(), true);
+
+        $tarifs = json_decode($this->getResponse($urlTarif)->getBody()->getContents(), true);
+        $tarifs = $tarifs['result'];
+        $tarifNames = [];
+
+        foreach ($tarifs as $tarif){
+            array_push($tarifNames, $tarif['tarifName']);
+        }
+//        dd($tarifNames);
+
+        $data = [];
+        $TotalSeatsCount = 0;
+
+        foreach ($seats['result'] as $seat) {
+            array_push($data, $seat);
+            $TotalSeatsCount++;
+        }
+
+        $object = new \stdClass();
+        $src = new \stdClass();
+        $object->data = $data;
+        $object->Total = $TotalSeatsCount;
+        $src->src = $object;
+
+        $statusCount = 0;
+        $statusNames = [];
+        $ticketStatusName = $seats['result'][0]['ticketStatusName'];
+        array_push($statusNames, $ticketStatusName);
+
+        foreach ($seats['result'] as $seat) {
+            if ($seat['ticketStatusName'] !== $ticketStatusName && !in_array($seat['ticketStatusName'], $statusNames)) {
+                array_push($statusNames, $seat['ticketStatusName']);
+                $ticketStatusName = $seat['ticketStatusName'];
+            }
+        }
+        $statusData = new \stdClass();
+        $sortedSeats = [];
+        foreach ($statusNames as $statusName) {
+            foreach ($seats['result'] as $seat) {
+                if($seat['ticketStatusName'] === $statusName) {
+                    array_push($sortedSeats, $seat);
+                    $statusCount++;
+                }
+            }
+            $statusData->$statusName = new \stdClass();
+            $statusData->$statusName->tickets = $sortedSeats;
+            $statusData->$statusName->totalCount = $statusCount;
+            $sortedSeats = [];
+            $statusCount = 0;
+        }
+
+//        dd($statusData->Проданный->tickets);
+        $tarifCount = 0;
+        $totalSoldTicketCount = 0;
+        $sortedByTarif = [];
+        $tarifData = new \stdClass();
+
+        foreach ($tarifNames as $tarifName){
+            foreach ($statusData->Проданный->tickets as $soldTicket){
+                if ($soldTicket['tarifName'] === $tarifName){
+                    array_push($sortedByTarif, $soldTicket);
+                    $tarifCount++;
+                }
+            }
+            if ($tarifName !== 'Пригласительное место') {
+                $totalSoldTicketCount += $tarifCount;
+            }
+            $tarifData->$tarifName = new \stdClass();
+            $tarifData->$tarifName->tickets = $sortedByTarif;
+            $tarifData->$tarifName->totalCount = $tarifCount;
+            $sortedByTarif = [];
+            $tarifCount = 0;
+        }
+        $tarifData->totalSoldTicketsCount = $totalSoldTicketCount;
+
+
+        $all = new \stdClass();
+        $all->src = $src;
+        $all->calculate = $statusData;
+        $all->calculatedByTarif = $tarifData;
+//        dd($all);
+
+        return [
+            'all' => $all
+        ];
+    }
+
     public function checkTarif($sessionId = "1554") {
         $url ='https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/' . $sessionId;
         $res = $this->getResponse($url);
@@ -188,7 +281,8 @@ class ParserController extends Controller
         array_push($statusNames, $ticketStatusName);
 
         foreach ($seats['result'] as $seat) {
-            if ($seat['tarifName'] !== $ticketStatusName && !in_array($seat['tarifName'], $statusNames)) {
+            if ($seat['tarifName'] !== $ticketStatusName && !in_array($seat['tarifName'],
+                )) {
                 array_push($statusNames, $seat['tarifName']);
                 $ticketStatusName = $seat['tarifName'];
             }
@@ -271,5 +365,37 @@ class ParserController extends Controller
         );
 
 //        dd($promise);
+    }
+
+    public function scheme($count = "100")
+    {
+        $url = 'https://cdn.iticket.uz/venue/scheme/';
+        $client = new Client();
+
+        $arr = [];
+        $k = 0;
+        for($i = 25; $i <= $count; $i++) {
+            $flag = true;
+            $uri = $url . $i . ".svg";
+            try {
+                $raw = $client->request('GET', $uri);
+            } catch (\Exception $e) {
+                $flag = false;
+            }
+            if($flag) {
+                $arr[] = [
+                    'scheme' => $uri
+                ];
+                $k++;
+            }
+        }
+
+        return [
+            'count' => $count,
+            'data' => [
+                'totalCount' => $k,
+                'urls' => $arr,
+            ]
+        ];
     }
 }
