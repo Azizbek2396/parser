@@ -33,7 +33,8 @@ class ReportController extends ParserController
             "Дата",
             "Место",
             "Проданный",
-            "Пригласительный"
+            "Пригласительный",
+            "Сумма"
         ];
 
         $body = [];
@@ -50,7 +51,8 @@ class ReportController extends ParserController
 				date("d.m.Y", strtotime($session["beginDate"])),
 				$session["palaceName"],
 				$counter["sold"],
-				$counter["free"]
+				$counter["free"],
+				$counter["sum"],
 			];
 		}
 	}
@@ -62,12 +64,19 @@ class ReportController extends ParserController
     protected function calc($sessionId)
     {
         $url = "https://cabinet.cultureticket.uz/api/CultureTicket/SessionTickets/";
+        $url1 = "https://cabinet.cultureticket.uz/api/CultureTicket/Tarifs/";
+
         $res = $this->getResponse($url . $sessionId);
+        $res1 = $this->getResponse($url1 . $sessionId);
+
         $tickets = json_decode($res->getBody()->getContents(), true);
+        $tarifs = json_decode($res1->getBody()->getContents(), true);
+//        dd($tarifs);
 
         $counter = [
             'sold' => 0,
             'free' => 0,
+            'sum'  => 0,
         ];
 
         foreach($tickets["result"] as $ticket) {
@@ -76,10 +85,15 @@ class ReportController extends ParserController
                     $counter["free"]++;
                 } else {
                     $counter["sold"]++;
+                    foreach ($tarifs['result'] as $tarif) {
+                        if ($ticket["tarifId"] == $tarif["id"]){
+                            $counter["sum"] += $tarif["price"];
+                        }
+                    }
                 }
             }
         }
-        
+
         return $counter;
     }
 
